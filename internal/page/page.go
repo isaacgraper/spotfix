@@ -14,22 +14,11 @@ type Page struct {
 	Page *rod.Page
 }
 
-type iPage interface {
-	// Clicks an element and can enable screenshot
-	Click(selector string, screenshot bool) error
-	// Click with N tries in an element
-	ClickWithRetry(selector string, maxTries int) error
-	// Add an id to a element in the page
-	AddElementId(selector, id string) error
-	// Scroll to an element using his JS Path
-	ScrollToElement(selector string) error
-	// Proceed the page if it's ended
-	Pagination() (error, bool)
-	// Enable filter the results before process
-	Filter() error
-	// Stabilize the page DOM and wait for changes
-	Loading()
-}
+// func (p *Page) NewPage(page *rod.Page) *Page {
+// 	return &Page{
+// 		Page: page,
+// 	}
+// }
 
 func (p *Page) Click(selector string, screenshot bool) error {
 	err := rod.Try(func() {

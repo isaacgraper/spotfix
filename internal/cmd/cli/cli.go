@@ -11,7 +11,7 @@ import (
 
 func Run() error {
 
-	var process *bot.Process
+	process := bot.NewProcess()
 
 	app := &cli.App{
 		Name:  "Bot",
