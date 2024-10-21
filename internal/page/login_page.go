@@ -34,9 +34,8 @@ func (p *Page) Login(c *config.Credential) error {
 		log.Printf("Error finding element: %v\n", err)
 		return err
 	}
+	// hardcode is not the usual way to do this
 	name.MustInput("Jorge").MustType(input.Tab)
-
-	p.Page.MustScreenshot("sla.png")
 
 	pwd, err := p.Page.Element("#inputPassword")
 	if err != nil {

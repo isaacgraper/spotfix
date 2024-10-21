@@ -59,7 +59,7 @@ func Run() error {
 						ctx.Bool("adjustment"),
 					)
 
-					if err := process.ProcessHandler(config); err != nil {
+					if err := process.Execute(config); err != nil {
 						log.Printf("Error while trying to start the bot: %v", err)
 					}
 
