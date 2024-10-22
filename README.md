@@ -21,32 +21,32 @@ git clone  https://github.com/isaacgraper/spotfix
 
 Instale as dependências
 ```bash
-git mody tidy
+go mody tidy
 ```
 
 ### Modo de uso
 
-Ver todos os comandos:
+Listas todos os comandos:
 ```bash
 go run . exec --help
 ```
 
-Executar processamento em lote sem filtros
+Executar processamento em lote sem filtros:
 ```bash
 go run . exec --max=20 (tamanho do lote: 10, máximo: 20)
 ```
 
-Executar o processamento em lote, passando hora e tipo da inconsistência
+Executar o processamento em lote, passando hora e tipo da inconsistência:
 ```bash
 go run . exec --filter --hour="9:00" --category="Fora do perímetro"
 ```
 
-Executar processamento utlizando a filtragem das inconsistências
+Executar processamento utlizando a filtragem das inconsistências:
 ```bash
 go run . exec --filter
 ```
 
-Executar processamento utlizando a filtragem das inconsistências, passando o tipo da inconsistência
+Executar processamento utlizando a filtragem das inconsistências, passando o tipo da inconsistência:
 ```bash
 go run . exec --filter --filter-category="Não registrado"
 ```
