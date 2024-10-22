@@ -26,14 +26,14 @@ go mody tidy
 
 ### Modo de uso
 
-Listas todos os comandos:
+Listar todos os comandos:
 ```bash
 go run . exec --help
 ```
 
 Executar processamento em lote sem filtros:
 ```bash
-go run . exec --max=20 (tamanho do lote: 10, máximo: 20)
+go run . exec --batch=10 --max=20 (tamanho do lote: 10, máximo: 20)
 ```
 
 Executar o processamento em lote, passando hora e tipo da inconsistência:

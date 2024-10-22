@@ -85,7 +85,7 @@ func (pr *Process) ProcessResult(c *config.Config) {
 		}
 	}`)
 
-	batchSize := 10
+	batchSize := c.BatchSize
 	for i := 0; i < c.Max; i += batchSize {
 		end := i + batchSize
 		if end > c.Max {
@@ -179,7 +179,7 @@ func (pr *Process) EndProcess() bool {
 	for _, selector := range elements {
 		time.Sleep(time.Millisecond * 250)
 
-		if err := pr.page.ClickWithRetry(selector, 3); err != nil {
+		if err := pr.page.Click(selector, false); err != nil {
 			log.Printf("Failed to click on %s: %v", selector, err)
 			return false
 		}
@@ -189,7 +189,7 @@ func (pr *Process) EndProcess() bool {
 	note := pr.page.Page.MustElement(`input#note`)
 	note.MustInput("Cancelamento automático via bot")
 
-	if err := pr.page.ClickWithRetry(`a.btn.button_link.btn-primary.ng-binding`, 3); err != nil {
+	if err := pr.page.Click(`a.btn.button_link.btn-primary.ng-binding`, false); err != nil {
 		log.Printf("Failed to click on submit button: %v", err)
 		return false
 	}

@@ -49,6 +49,11 @@ func Run() error {
 						Usage: "Enable adjustment process",
 						Value: false,
 					},
+					&cli.IntFlag{
+						Name:  "batch",
+						Usage: "Batch size for process without filter",
+						Value: 10,
+					},
 				},
 				Action: func(ctx *cli.Context) error {
 					config := config.Set(
@@ -57,6 +62,7 @@ func Run() error {
 						ctx.Bool("filter"),
 						ctx.Int("max"),
 						ctx.Bool("adjustment"),
+						ctx.Int("batch"),
 					)
 
 					if err := process.Execute(config); err != nil {
