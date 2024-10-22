@@ -168,27 +168,10 @@ func (p *Page) DateFilter() error {
 		return err
 	}
 
-	// date := time.Now()
-	// newDate := date.AddDate(0, 0, -7)
-	// dateFormat := newDate.Format("02/01/2006")
-	// datePiece := strings.Split(dateFormat, "/")
+	date := time.Now()
+	newDate := date.AddDate(0, 0, -7)
 
-	el.Focus()
-
-	p.Loading()
-
-	el.Type(input.Digit0)
-
-	el.Type(input.Digit1)
-	time.Sleep(200 * time.Millisecond)
-	el.Type(input.Digit4)
-	time.Sleep(200 * time.Millisecond)
-	el.Type(input.Digit1)
-	time.Sleep(200 * time.Millisecond)
-	el.Type(input.Digit0)
-
-	time.Sleep(5 * time.Second)
-
+	el.MustInputTime(newDate)
 	return nil
 }
 
