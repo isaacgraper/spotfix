@@ -65,7 +65,7 @@ func (pr *Process) ProcessHandler(c *config.Config) (error, bool) {
 		pr.ProcessResult(c)
 
 		if !pr.page.Pagination() {
-			log.Println("No more inconsistencies to process.")
+			log.Println("no more pages to process")
 			break
 		}
 	}
@@ -74,7 +74,7 @@ func (pr *Process) ProcessHandler(c *config.Config) (error, bool) {
 
 func (pr *Process) ProcessResult(c *config.Config) {
 	if c.Max < 1 {
-		log.Println("No results to process")
+		log.Println("no results to process")
 		return
 	}
 
@@ -93,10 +93,11 @@ func (pr *Process) ProcessResult(c *config.Config) {
 		}
 		pr.ProcessBatch(i+1, end, c)
 	}
+
 	pr.EndProcess()
 }
 
-func (pr *Process) ProcessBatch(start, end int, c *config.Config) {
+func (pr *Process) ProcessBatch(start, end int, c *config.Config) error {
 	results := pr.page.Page.MustEval(fmt.Sprintf(`() => {
 		const results = [];
 		for (let i = %d; i <= %d; i++) {
@@ -130,21 +131,23 @@ func (pr *Process) ProcessBatch(start, end int, c *config.Config) {
 
 		if shouldProcess {
 			log.Printf("%s - %s - %s", name, hour, category)
+
+			// report implementation here
+
 			index := result.Get("index").Int()
 
 			pr.page.Loading()
 			time.Sleep(time.Millisecond * 250)
 
 			if err := pr.page.ClickWithRetry(fmt.Sprintf(`#inconsistence-%d i`, index), 6); err != nil {
-				log.Printf("Failed to click on inconsistency %d: %v", index, err)
+				log.Printf("failed to click on inconsistency %d: %w", index, err)
 			}
 		}
 	}
+	return nil
 }
 
 func (pr *Process) ProcessFilter(c *config.Config) {
-	log.Println("Processing with filter")
-
 	for {
 		if err := pr.page.Click(`#content > div.app-content-body.nicescroll-continer > div.content-body > div.app-content-body > div.tab-lis > div.content-table > table > thead > tr > th:nth-child(1) > label > i`, false); err != nil {
 			log.Printf("Failed to click filter checkbox: %v", err)
@@ -164,9 +167,6 @@ func (pr *Process) ProcessFilter(c *config.Config) {
 }
 
 func (pr *Process) EndProcess() bool {
-	log.Println("Process ended")
-	log.Println("Adjusting inconsistencies...")
-
 	pr.page.Page.MustElement(`td.ng-binding`).ScrollIntoView()
 
 	elements := []string{
@@ -195,6 +195,6 @@ func (pr *Process) EndProcess() bool {
 	}
 	pr.page.Loading()
 
-	log.Println("Inconsistencies done!")
+	log.Println("inconsistencies processed!")
 	return true
 }

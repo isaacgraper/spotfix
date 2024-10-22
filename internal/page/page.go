@@ -74,7 +74,7 @@ func (p *Page) ClickWithRetry(selector string, maxRetries int) error {
 	return fmt.Errorf("failed to click on %s after %d attempts: %v", selector, maxRetries, err)
 }
 
-func (p *Page) AddElementId(selector, id string) error {
+func (p *Page) AddElementId(selector, id string) {
 	p.Page.Eval(fmt.Sprintf(`() => {
 		const el = %s;
 		if (el) {
@@ -84,10 +84,9 @@ func (p *Page) AddElementId(selector, id string) error {
 		}
 	}`, selector, id, selector))
 
-	return nil
 }
 
-func (p *Page) ScrollToElement(selector string) error {
+func (p *Page) ScrollToElement(selector string) {
 	p.Page.Eval(fmt.Sprintf(`() => {
 		const element = document.querySelector('%s');
 		if (element) {
@@ -97,27 +96,21 @@ func (p *Page) ScrollToElement(selector string) error {
 		}
 	}`, selector, selector))
 
-	return nil
 }
 
 func (p *Page) Pagination() bool {
-
-	// implement error handling here
 	hasNextPage := p.Page.MustHas(`[ng-click="changePage('next')"]`)
 	if !hasNextPage {
-		log.Println("No next page found or error occurred:")
 		return false
 	}
 
 	if err := p.ClickWithRetry(`[ng-click="changePage('next')"]`, 3); err != nil {
-		log.Println("Failed to click next page button:", err)
 		return false
 	}
 
 	p.Loading()
 
 	log.Println("Moved to next page")
-
 	return true
 }
 
@@ -138,6 +131,8 @@ func (p *Page) Filter() error {
 	}
 
 	p.Loading()
+
+	// filter category logic enters here
 
 	err = element.Type(input.ArrowDown)
 	if err != nil {

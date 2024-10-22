@@ -10,7 +10,6 @@ import (
 )
 
 func Run() error {
-
 	process := bot.NewProcess()
 
 	app := &cli.App{
@@ -60,15 +59,15 @@ func Run() error {
 						ctx.String("hour"),
 						ctx.String("category"),
 						ctx.Bool("filter"),
+						// implement filter category with filter
 						ctx.Int("max"),
 						ctx.Bool("adjustment"),
 						ctx.Int("batch"),
 					)
 
 					if err := process.Execute(config); err != nil {
-						log.Printf("Error while trying to start the bot: %v", err)
+						log.Fatalf("error while trying to start the bot: %v", err)
 					}
-
 					return nil
 				},
 			},
