@@ -8,7 +8,6 @@ import (
 
 	"github.com/go-rod/rod"
 	"github.com/go-rod/rod/lib/launcher"
-	"github.com/isaacgraper/spotfix.git/internal/common"
 	"github.com/isaacgraper/spotfix.git/internal/common/config"
 	"github.com/isaacgraper/spotfix.git/internal/page"
 )
@@ -79,6 +78,7 @@ func (pr *Process) ProcessResult(c *config.Config) {
 		return
 	}
 
+	// debug, eval is not working
 	pr.page.Page.MustEval(`() => {
 		const el = document.querySelectorAll('[data-id]');
 		for (let i = 1; i < el.length; i++) {
@@ -86,6 +86,7 @@ func (pr *Process) ProcessResult(c *config.Config) {
 		}
 	}`)
 
+	log.Printf("batch: %d, max: %d", c.BatchSize, c.Max)
 	batchSize := c.BatchSize
 	for i := 0; i < c.Max; i += batchSize {
 		end := i + batchSize
@@ -99,6 +100,8 @@ func (pr *Process) ProcessResult(c *config.Config) {
 }
 
 func (pr *Process) ProcessBatch(start, end int, c *config.Config) error {
+
+	// debug, eval is not working
 	results := pr.page.Page.MustEval(fmt.Sprintf(`() => {
 		const results = [];
 		for (let i = %d; i <= %d; i++) {
@@ -114,8 +117,9 @@ func (pr *Process) ProcessBatch(start, end int, c *config.Config) error {
 		}
 		return results;
 	}`, start, end))
-
 	pr.page.Loading()
+
+	// var wg sync.WaitGroup
 
 	for _, result := range results.Arr() {
 		category := result.Get("category").String()
@@ -125,23 +129,15 @@ func (pr *Process) ProcessBatch(start, end int, c *config.Config) error {
 		hourSplit := strings.Split(hour, " ")
 		hour = strings.TrimSpace(hourSplit[1])
 
-		if category != "Não registrado" {
+		shouldProcess := (c.Hour == "" && c.Category == "") ||
+			(c.Hour == "" && category == c.Category) ||
+			(c.Category == "" && hour == c.Hour) ||
+			(hour == c.Hour && category == c.Category)
+
+		if shouldProcess {
 			log.Printf("%s - %s - %s", name, hour, category)
 
 			index := result.Get("index").Int()
-
-			resultJSON, err := result.MarshalJSON()
-			if err != nil {
-				log.Printf("Erro ao converter result para JSON: %v", err)
-				continue
-			}
-
-			concatStr := string(resultJSON)
-
-			go func() {
-				fileName := fmt.Sprintf("report-%s.txt", time.Now().Format("01-02-2006"))
-				common.NewFile(fileName, []byte(concatStr)).SaveFile()
-			}()
 
 			pr.page.Loading()
 			time.Sleep(time.Millisecond * 250)
@@ -150,6 +146,25 @@ func (pr *Process) ProcessBatch(start, end int, c *config.Config) error {
 				log.Printf("failed to click on inconsistency %v", err)
 			}
 		}
+
+		// resultJSON, err := result.MarshalJSON()
+		// if err != nil {
+		// 	log.Printf("error converting to json: %v", err)
+		// 	continue
+		// }
+
+		// concatStr := string(resultJSON)
+
+		// if hour == c.Hour {
+		// 	wg.Add(1)
+		// 	go func(concatStr string, index int) {
+		// 		fileName := fmt.Sprintf("relatório-%s.txt", time.Now().Format("02-01-2006/13:10:00"))
+		// 		common.NewFile(fileName, []byte(concatStr)).SaveFile()
+		// 	}(concatStr, index)
+
+		// 	wg.Wait()
+
+		// }
 	}
 	return nil
 }
