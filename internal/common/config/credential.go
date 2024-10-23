@@ -7,5 +7,6 @@ type Credential struct {
 }
 
 func (c *Config) NewCredential() *Credential {
+	// can improve the credential logic within login_page
 	return &Credential{}
 }

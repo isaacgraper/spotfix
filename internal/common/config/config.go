@@ -7,7 +7,6 @@ type Config struct {
 	Max        int
 	Adjustment bool
 	BatchSize  int
-	Results    []byte
 }
 
 func Set(hour, category string, filter bool, max int, adjustment bool, batchSize int) *Config {

@@ -8,6 +8,7 @@ import (
 
 	"github.com/go-rod/rod"
 	"github.com/go-rod/rod/lib/launcher"
+	"github.com/isaacgraper/spotfix.git/internal/common"
 	"github.com/isaacgraper/spotfix.git/internal/common/config"
 	"github.com/isaacgraper/spotfix.git/internal/page"
 )
@@ -93,7 +94,7 @@ func (pr *Process) ProcessResult(c *config.Config) {
 		}
 		pr.ProcessBatch(i+1, end, c)
 	}
-
+	// implements SendEmail here before ending the process
 	pr.EndProcess()
 }
 
@@ -124,23 +125,29 @@ func (pr *Process) ProcessBatch(start, end int, c *config.Config) error {
 		hourSplit := strings.Split(hour, " ")
 		hour = strings.TrimSpace(hourSplit[1])
 
-		shouldProcess := (c.Hour == "" && c.Category == "") ||
-			(c.Hour == "" && category == c.Category) ||
-			(c.Category == "" && hour == c.Hour) ||
-			(hour == c.Hour && category == c.Category)
-
-		if shouldProcess {
+		if category != "Não registrado" {
 			log.Printf("%s - %s - %s", name, hour, category)
 
-			// report implementation here
-
 			index := result.Get("index").Int()
+
+			resultJSON, err := result.MarshalJSON()
+			if err != nil {
+				log.Printf("Erro ao converter result para JSON: %v", err)
+				continue
+			}
+
+			concatStr := string(resultJSON)
+
+			go func() {
+				fileName := fmt.Sprintf("report-%s.txt", time.Now().Format("01-02-2006"))
+				common.NewFile(fileName, []byte(concatStr)).SaveFile()
+			}()
 
 			pr.page.Loading()
 			time.Sleep(time.Millisecond * 250)
 
 			if err := pr.page.ClickWithRetry(fmt.Sprintf(`#inconsistence-%d i`, index), 6); err != nil {
-				log.Printf("failed to click on inconsistency %d: %w", index, err)
+				log.Printf("failed to click on inconsistency %v", err)
 			}
 		}
 	}
